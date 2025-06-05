@@ -1,27 +1,62 @@
-import useSWR from 'swr';
-import { fetcher } from '../lib/fetcher';
+import { useState } from 'react';
 
-export default function Home() {
-  const { data, error, isLoading } = useSWR(
-    'https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL?token=927c456f9a4bec44887e5cc0e2d154c8f843f33855ec2ec0d15db596ee7d19cd',
-    fetcher,
-    { refreshInterval: 5000 } // Atualiza a cada 60s //1000 == 1 segundo refresh page
-  );
+export default function Cotacao() {
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [cotacoes, setCotacoes] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  if (error) return <div>Erro ao carregar dados.</div>;
-  if (isLoading || !data) return <div>Carregando...</div>;
+  const buscarCotacoes = async () => {
+    setLoading(true);
 
-  const usdbrl = data.USDBRL;
+    const start = startDate.replace(/-/g, '');
+    const end = endDate.replace(/-/g, '');
+
+    const url = `https://economia.awesomeapi.com.br/json/daily/USD-BRL/365?start_date=${start}&end_date=${end}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      setCotacoes(data);
+    } catch (error) {
+      console.error('Erro ao buscar cotações:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main style={{ padding: '2rem', fontFamily: 'Arial' }}>
-      <h1>Cotação Dólar Hoje (USD/BRL)</h1>
-      <p><strong>Compra:</strong> R$ {usdbrl.bid}</p>
-      <p><strong>Venda:</strong> R$ {usdbrl.ask}</p>
-      <p><strong>Alta:</strong> R$ {usdbrl.high}</p>
-      <p><strong>Baixa:</strong> R$ {usdbrl.low}</p>
-      <p><strong>Variação:</strong> {usdbrl.varBid} ({usdbrl.pctChange}%)</p>
-      <small>Atualizado: {new Date(Number(usdbrl.timestamp) * 1000).toLocaleString()}</small>
+      <h1>Buscar Cotação USD/BRL</h1>
+
+      <div>
+        <label>Data Início:</label>
+        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+      </div>
+
+      <div>
+        <label>Data Fim:</label>
+        <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+      </div>
+
+      <button onClick={buscarCotacoes}>Buscar</button>
+
+      {loading && <p>Carregando...</p>}
+
+      {cotacoes.length > 0 && (
+        <div>
+          <h2>Resultados:</h2>
+          <ul>
+            {cotacoes.map((item, index) => (
+              <li key={index}>
+                <strong>Data:</strong> {new Date(item.timestamp * 1000).toLocaleDateString()} |
+                <strong> Compra:</strong> R$ {item.bid} |
+                <strong> Venda:</strong> R$ {item.ask}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </main>
   );
 }
