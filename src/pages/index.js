@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import Link from 'next/link'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
@@ -10,13 +11,15 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Olá, mundo! 👋
-        </h1>
+      <main>
+        <h1 className={styles.title}>Olá, mundo! 👋</h1>
         <p className={styles.description}>
           Esta é uma aplicação Next.js usando JavaScript.
         </p>
+
+        <Link href="/cotacao">
+          <button className={styles.button}>Acessar Cotação USD/BRL</button>
+        </Link>
       </main>
 
       <footer className={styles.footer}>

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import Link from 'next/link';
+import styles from '../styles/Home.module.css';
 
 export default function Cotacao() {
   const [startDate, setStartDate] = useState('');
@@ -26,27 +28,31 @@ export default function Cotacao() {
   };
 
   return (
-    <main style={{ padding: '2rem', fontFamily: 'Arial' }}>
-      <h1>Buscar Cotação USD/BRL</h1>
+    <main className={styles.container}>
+      <h1 className={styles.title}>Buscar Cotação USD/BRL</h1>
 
-      <div>
+      <div className={styles.inputGroup}>
         <label>Data Início:</label>
         <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
       </div>
 
-      <div>
+      <div className={styles.inputGroup}>
         <label>Data Fim:</label>
         <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
       </div>
 
-      <button onClick={buscarCotacoes}>Buscar</button>
+      <button className={styles.button} onClick={buscarCotacoes}>Buscar</button>
+
+      <Link href="/">
+        <button className={styles.button}>Voltar para Home</button>
+      </Link>
 
       {loading && <p>Carregando...</p>}
 
       {cotacoes.length > 0 && (
         <div>
-          <h2>Resultados:</h2>
-          <ul>
+          <h2 className={styles.title}>Resultados:</h2>
+          <ul className={styles.resultList}>
             {cotacoes.map((item, index) => (
               <li key={index}>
                 <strong>Data:</strong> {new Date(item.timestamp * 1000).toLocaleDateString()} |
